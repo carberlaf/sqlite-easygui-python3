@@ -1,294 +1,297 @@
 #! /usr/bin/env python3
 
 """
-    La interface básica de la aplicación es un cuadro de elección de acciones en pantalla
-    Si se ejecuta en terminal Linux. -> ./utilBd.py
-        la acción salir en este modo cierra la aplicación
-    Si se importa a PythonConsole -> from utilBD import *
-        la acción salir oculta la gui
-        teclear >>> ver_gui() para mostrar de nuevo el cuadro de acciones en pantalla
-    Varias funciones para utilizar sqlite3 en :memory:
-    Se pueden importar/exportar bases de datos desde/hacia archivos dump.sql
-    Se pueden importar/exportar tablas desde/hacia archivos .csv
-    Se pueden adjuntar bases de datos .sqlite
-    Se utiliza el módulo easygui y a través de los distintos diálogos que aparecen
-        en pantalla se introducen datos, se eligen acciones a realizar, etc...
+    The basic interface of the application is a choice box screen actions
+         If it runs on Linux terminal. -> ./utilBd.py
+             action out in this way closes the application
+         If you import to PythonConsole -> from utilBD import *
+             action out hides the gui
+             type display_gui () to redisplay the dialog screen actions
+     Several functions to use sqlite3 in: memory:
+     You can import / export databases from / to dump.sql files
+     You can import / export tables from / to CSV files
+     You can attach databases .sqlite
+     It's used the module easygui and through the various dialogs displayed
+         in screen: data is entered, actions are chosen to perform, etc ...
 
+__author__=carberlaf
 """
 
 import sqlite3 as sq
+
 import easygui as eg
 
-# A utilizar como título en las ventanas
-TITULO = 'UTILIZACIÓN DE SQLITE3'
-# dict -> esquema base (key(nombre de tabla):value(lista de campos)
-esquema = {}
+# A title used in dialog_boxes
+TITLE = 'UTILS -- SQLITE3'
+# dict -> scheme database (key(table's name):value(list of fields)
+scheme = {}
 
-_con = sq.connect(':memory:')  # inicio de la conexión
-_con.row_factory = sq.Row  # Row factory para utilizar los resultados como dicccionario
-_c = _con.cursor()  # se crea cursor para ejecutar las sqls
+_con = sq.connect(':memory:')  # init connection
+_con.row_factory = sq.Row  # init row factory to use the results as dict
+_c = _con.cursor()  # init cursor to exec the sql
 
 
-def _cuantos_campos(num):  # se utiliza en la funcion crear tabla
-    _campos = []
+def _howmany_fields(num):  # used in function new_table
+    _fields = []
     for i in range(1, num + 1):
-        _campos.append('campo' + i.__str__())
-    return _campos
+        _fields.append('field' + i.__str__())
+    return _fields
 
 
-def _concat(*args, sep=','):  # se utiliza para concatenar las sentencias sql
+def _concat(*args, sep = ','):  # used to format the sql
     return sep.join(*args)
 
 
-def crear_tabla():
+def new_table():
     """
-    Hay que teclear en un diálogo:
-        el nombre de la tabla a crear y
-        el número de campos que tendrá la tabla
-    Por defecto crea campos con nombres:
-        campo1, campo2, ..., campon
-    En el siguiente diálogo se da opción a cambiar estos nombres
-    :return: mensaje de creación de tabla
+    You must enter into a dialogue_box:
+         the name of the table to create and
+         the number of fields that will have the table
+     By default creates fields with names:
+         field1, field2, ..., field_n
+     In the next dialog_box shown,  gives option to change these names
+     : Return: message-table
     """
     try:
-        _tabla, num_campos = eg.multenterbox('Datos de la tabla', TITULO,
-                                             fields=['nombre de la tabla', 'número de campos'])
-        _campos = eg.multenterbox(msg='Introducir nombres de campos',
-                                  title=TITULO,
-                                  fields=_cuantos_campos(int(num_campos)),
-                                  values=_cuantos_campos(int(num_campos)))
-        _sql = 'create table ' + _tabla + '(' + _concat(_campos, sep=',') + ');'
+        _table, _fields_number = eg.multenterbox("Table's data", TITLE,
+                                                 fields = ["table's name", "number of fields"])
+        _fields = eg.multenterbox(msg = 'Key the names of fields',
+                                  title = TITLE,
+                                  fields = _howmany_fields(int(_fields_number)),
+                                  values = _howmany_fields(int(_fields_number)))
+        _sql = 'create table ' + _table + '(' + _concat(_fields, sep = ',') + ');'
         _c.execute(_sql)
-        esquema[_tabla] = _campos
+        scheme[_table] = _fields
         _con.commit()
-        eg.msgbox('Creada tabla ' + _tabla, TITULO)
+        eg.msgbox('Created table ' + _table, TITLE)
     except:
         pass
 
 
-def insertar_datos(tabla):
+def insert_data(table):
     """
-    Se muestra un diálogo con los nombres de los campos
-    para introducir los valores de cada uno de ellos
-    :param tabla: str
-    :return None
+    A dialog_box is displayed with the field names to enter values for each
+     : Param table: str
+     : Return None
     """
     try:
-        datos = eg.multenterbox('Introducir Datos', TITULO, esquema[tabla])
-        _sql = "insert into " + tabla + " values('" + _concat(datos, sep="','") + "');"
+        data = eg.multenterbox('Introducing data', TITLE, scheme[table])
+        _sql = "insert into " + table + " values('" + _concat(data, sep = "','") + "');"
         _c.execute(_sql)
         _con.commit()
     except:
-        pass
+        pass  # if button cancel is pressed
 
 
-def ver_datos(tabla):
+def select_data(table):
     """
-    Es una simple consulta SELECT de la tabla
-    Se muestra cuadro con los datos de la tabla. Incluye el rowid
-    :rtype: cuadro con los datos
-    :param tabla: str
+    It is a simple query SELECT from table
+    The data in the table is shown into a text_box.
+     It includes rowid
+     : rtype: table with data
+     : Param table: str
     """
     try:
-        _sql = "select rowid, * from " + tabla
-        registros = _c.execute(_sql).fetchall()
-        lectura = '{:*^40}'.format(tabla) + '\n'
-        lectura += str(registros[0].keys()) + '\n'
-        for _row in registros:
-            lectura += str(list([*_row])) + "\n"
-        eg.textbox('Datos en ' + tabla, TITULO, lectura)
+        _sql = "select rowid, * from " + table
+        records = _c.execute(_sql).fetchall()
+        reading = '{:*^40}'.format(table) + '\n'
+        reading += str(records[0].keys()) + '\n'
+        for _row in records:
+            reading += str(list([*_row])) + "\n"
+        eg.textbox('Content in %s' % table, TITLE, reading)
     except:
-        pass
+        pass  # if button cancel is pressed
 
 
-def guardar_base():
+def save_base():
     """
-    Se guarda la base en un archivo 'dump' con extensión .sql
+    Save the all database in a file 'dump' with extension .sql
     :return: None
     """
-    with open(eg.filesavebox('', '', default="dump_*.sql", filetypes=' \*.sql'), 'w') as _f:
+    with open(eg.filesavebox('', '', default = "dump_*.sql", filetypes = ' \*.sql'), 'w') as _f:
         for _line in _con.iterdump():
             _f.write('%s\n' % _line)
 
 
-def recuperar_base(origen, _master=None):
+def recover_base(origin, _master = None):
     """
-    Según el origen:
-        si .sql(0) se abre base
-        si .sqlite(1) se adjunta
-    Se actualiza el esquema
-    :param origen: int
-    :param _master: None
-        Se utiliza la tabla sqlite_master de la recuperada para actualizar el esquema
-    :return: None
+    According to the source:
+         if .sql (origin=0) database is open in :memory:
+         if .sqlite (origin=1) database is attached
+     The scheme of the database is updated
+     : Param origin: int
+     : Param _master: None
+         the sqlite_master recovered table is used to update the schema
+     : Return: None
     """
     try:
-        if origen == 0:  # desde .sql
-            with open(eg.fileopenbox(default='./*.sql'), 'r') as _f:
+        if origin == 0:  # from .sql
+            with open(eg.fileopenbox(default = './*.sql'), 'r') as _f:
                 for _line in _f:
                     _con.execute(_line)
-        if origen == 2:  # desde *.sqlite
-            _archivo = eg.fileopenbox(default='./*.sqlite3', filetypes=[['*.sqlite', '*.sqlite3', 'Sqlite Files']])
-            _con.execute('attach database "' + _archivo + '" as adjunta')
+        if origin == 2:  # from *.sqlite
+            _file = eg.fileopenbox(default = './*.sqlite3', filetypes = [['*.sqlite', '*.sqlite3', 'Sqlite Files']])
+            _con.execute('attach database "' + _file + '" as attached')
 
     except:
         pass
-    finally:  # recuperar esquema
-        if origen == 0:
+    finally:  # update scheme
+        if origin == 0:
             _master = 'sqlite_master'
-        if origen == 2:
-            _master = 'adjunta.sqlite_master'
+        if origin == 2:
+            _master = 'attached.sqlite_master'
         for _row in _c.execute('select name from ' + _master).fetchall():
             _sql = 'select * from {} limit 1'.format(_row[0])
             for _r in _c.execute(_sql).fetchall():
-                esquema[_row[0]] = list(_r.keys())
+                scheme[_row[0]] = list(_r.keys())
 
 
-def actualizar_datos(tabla, rowid, *nuevos):
+def update_data(table, rowid, *news):
     """
-    Se actualizan los datos de un registro (rowid) dentro de una tabla (tabla)
-    Ambos son parametros obligatorios.
-    Si no hay parámetro *nuevos, se toma el registro y se muestra el estado actual
-        para permitir modificar los datos.
-    Si existe *nuevos se muestra cómo quedaría el registro y dar el Ok.
-    :param tabla: str
-    :param rowid: int
-    :param nuevos: lista
+     Data record (rowid) are updated within a table
+     Both parameters are mandatory.
+     If there is no *news parameter, it takes the record and the current status is displayed
+         to allow modify data.
+     If there's *news shows how would the record and give the OK.
+     : param table: str
+     : param rowid: int
+     : param *news: list
     """
-    if not nuevos:
-        sql = 'select * from %s where rowid=%s' % (tabla, rowid)
-        _valores = list(*[_c.execute(sql).fetchone()])
+    if not news:
+        sql = 'select * from %s where rowid=%s' % (table, rowid)
+        _values = list(*[_c.execute(sql).fetchone()])
     else:
-        _valores = nuevos
+        _values = news
     try:
-        datos = eg.multenterbox('Actualizar registro con rowid %s' % rowid, TITULO,
-                                fields=esquema[tabla], values=_valores)
-        l = dict(zip(esquema[tabla], datos))
-        sql = 'update ' + tabla + ' set '
+        _data = eg.multenterbox('Update record with rowid %s' % rowid, TITLE,
+                                fields = scheme[table], values = _values)
+        l = dict(zip(scheme[table], _data))
+        sql = 'update ' + table + ' set '
         for k, v in l.items():
             sql += k + '="' + v + '",'
-        sql = sql[0:len(sql) - 1]  # quito la ultima coma
+        sql = sql[0:len(sql) - 1]  # delete the last coma
         sql += ' where rowid=' + str(rowid) + ';'
         _c.execute(sql)
-    except TypeError:  # si se cancela la entrada de datos
+    except TypeError:  # if button cancel is pressed
         pass
 
 
-def tabla2csv():
+def table2csv():
     """
-    Se elige un tabla y la convierte en un archivo con nombre <tabla>.csv
-    :return: muestra un cuadro con el contenido del archivo creado para su comprobación
+     A table is chosen and save it in a file named <table>.csv
+     : return: displays a text_box with the file content created for verification
     """
     import csv
-    tabla = eg.choicebox('Seleccionar tabla a convertir a .csv', TITULO, choices=list(esquema.keys()))
-    archivo = tabla + '.csv'
-    respuesta = _c.execute('select * from ' + tabla).fetchall()
-    with open(archivo, 'w') as f:
-        fieldnames = respuesta[0].keys()
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
+    table = eg.choicebox('Choose table to convert to .csv', TITLE, choices = list(scheme.keys()))
+    file = table + '.csv'
+    response = _c.execute('select * from ' + table).fetchall()
+    with open(file, 'w') as f:
+        fieldnames = response[0].keys()
+        writer = csv.DictWriter(f, fieldnames = fieldnames)
         writer.writeheader()
-        for x in range(len(respuesta)):
-            writer.writerow({k: respuesta[x][k] for k in respuesta[x].keys()})
-    # comprobación
-    with open(archivo) as f:
+        for x in range(len(response)):
+            writer.writerow({k: response[x][k] for k in response[x].keys()})
+    # verification
+    with open(file) as f:
         reader = csv.reader(f)
-        lectura = ""
+        reading = ""
         for row in reader:
-            lectura += str(row) + '\n'
-        eg.textbox('Creado archivo {} con el contenido: '.format(archivo), TITULO, lectura)
+            reading += str(row) + '\n'
+        eg.textbox('Saved file {} with content: '.format(file), TITLE, reading)
 
 
-def csv2tabla():
+def csv2table():
     """
-    Se elige un <archivo>.csv y la convierte en una tabla con nombre <archivo>
-    :return: None
+     A <filename>.csv is chosen and becomes a table named <filename>
+     : return: None
     """
     from csv import reader
-    arch = eg.fileopenbox(default='*.csv')
-    tabla = arch.split('/')[len(arch.split('/')) - 1].replace('.csv', '')
+    arch = eg.fileopenbox(default = '*.csv')
+    table = arch.split('/')[len(arch.split('/')) - 1].replace('.csv', '')
     with open(arch) as f:
-        lector = reader(f)
-        nombre_campos = next(lector)
-        sql = 'create table ' + tabla + '(' \
-              + _concat(nombre_campos, sep=',') + ')'
+        _reader = reader(f)
+        _fields = next(_reader)
+        sql = 'create table ' + table + '(' \
+              + _concat(_fields, sep = ',') + ')'
         _c.execute(sql)
-        esquema[tabla] = nombre_campos
-        for row in lector:
-            sql = "insert into " + tabla + " values('" + \
-                  _concat(row, sep="','") + "');"
+        scheme[table] = _fields
+        for row in _reader:
+            sql = "insert into " + table + " values('" + \
+                  _concat(row, sep = "','") + "');"
             _c.execute(sql)
 
 
-# Muestra diálogo inicial para seleccionar la acción a ejecutar
-def ver_gui(v=True):
+# Initial dialog_box to select the action to execute
+def display_gui(v = True):
     while v:
-        if len(list(esquema.keys())) > 0:
-            _acciones = ['crear tabla', 'insertar', 'ver',
-                         'actualizar', 'guardar',
-                         'recuperar', 'salir']
+        if len(list(scheme.keys())) > 0:
+            _actions = ['new table', 'insert', 'select',
+                        'update', 'save',
+                        'recover', 'quit']
         else:
-            _acciones = ['crear tabla',
-                         'recuperar',
-                         'salir']
-        _respuesta = eg.buttonbox('''
-                    Diálogo Principal
-                    Elegir acción''', TITULO, _acciones)
+            _actions = ['new table',
+                        'recover',
+                        'quit']
+        _response = eg.buttonbox('''
+                    Main Dialog
+                    Choose action''', TITLE, _actions)
 
-        if _respuesta == 'crear tabla':
-            crear_tabla()
+        if _response == 'new table':
+            new_table()
 
-        if _respuesta == 'insertar':
-            _tabla = eg.choicebox('Seleccionar tabla', _respuesta, choices=list(esquema.keys()))
-            if not _tabla:
+        if _response == 'insert':
+            _table = eg.choicebox('Choose table to insert', _response, choices = list(scheme.keys()))
+            if not _table:
                 continue
-            insertar_datos(_tabla)
+            insert_data(_table)
 
-        if _respuesta == 'ver':
-            _tabla = eg.choicebox('Seleccionar tabla', _respuesta, choices=list(esquema.keys()))
-            if _tabla:
-                ver_datos(_tabla)
+        if _response == 'select':
+            _table = eg.choicebox('Choose table from select', _response, choices = list(scheme.keys()))
+            if _table:
+                select_data(_table)
 
-        if _respuesta == 'actualizar':
-            _tabla = eg.choicebox('Seleccionar tabla', _respuesta, choices=list(esquema.keys()))
-            _rowid = eg.integerbox('Seleccionar rowid', _respuesta)
-            if not _tabla or not _rowid:
+        if _response == 'update':
+            _table = eg.choicebox('Choose table to update', _response, choices = list(scheme.keys()))
+            _rowid = eg.integerbox('Choose rowid to update', _response)
+            if not _table or not _rowid:
                 continue
-            actualizar_datos(_tabla, _rowid)
+            update_data(_table, _rowid)
 
-        if _respuesta == 'guardar':
-            _x = eg.indexbox('''        Observaciones:
-                            En formato sql se guarda toda la base :memory:
-                        no las bases adjuntas.\n
-                            En formato csv una sola tabla
-                        pero también de las adjuntas''',
-                             TITULO,
-                             choices=['en sql', 'en csv'])
+        if _response == 'save':
+            _x = eg.indexbox('''    Comment:
+                        In .sql format to save the whole base from :memory:
+                    except attached bases.\n
+                        In .csv format one by one table,
+                    but also from the attached bases''',
+                             TITLE,
+                             choices = ['in .sql', 'in .csv'])
             if _x == 0:
-                guardar_base()
+                save_base()
             elif _x == 1:
-                tabla2csv()
+                table2csv()
             else:
                 continue
 
-        if _respuesta == 'recuperar':
-            _x = eg.indexbox('''        ¿Desde?:
-                            sql o csv: se crea(n) tabla(s) en memoria\n
-                            sqlite:    se adjunta base''',
-                             'Recuperar Base',
-                             choices=['*.sql', '*.csv', '*.sqlite'])
+        if _response == 'recover':
+            _x = eg.indexbox('''        From?:
+                             sql:    import one or several tables\n
+                             csv:    import one table\n
+                             sqlite: attach base''',
+                             'Recover base or table',
+                             choices = ['*.sql', '*.csv', '*.sqlite'])
             if _x == 1:
-                csv2tabla()
+                csv2table()
             else:
-                recuperar_base(_x)
+                recover_base(_x)
 
-        if _respuesta == 'salir':
+        if _response == 'quit':
             break
 
 
-def _inicio():
-    eg.msgbox('Vamos a crear una base "in memory"', TITULO)
-    ver_gui()
+def _init():
+    eg.msgbox("Let's create an 'in memory' base", TITLE)
+    display_gui()
 
 
 if __name__ == '__main__':
-    _inicio()
+    _init()
