@@ -1,7 +1,14 @@
-#utilBD
+#sqlite-easygui-python3  
 
-Utiliza módulo **easygui** para crear una interface volante  
-Se puede utilizar:
-    desde la consola Python: from utilBD import *
-    como desde terminal linux  
-Hay dos ramas con el mismo código, una de ellas en español y la otra en inglés
+Utils sqlite3 (:memory:) with light interface made with easygui and python3.5.2
+
+There is a branch with an english version.
+
+#utilBD  
+
+Utiliza módulo **easygui** para mostrar una interface "volante".  
+Se puede utilizar desde la consola Python: from utilBD import * 
+o desde terminal linux. Hacerlo ejecutable.  
+En la rama master está la versión en español.
+
+#
