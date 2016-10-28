@@ -10,6 +10,7 @@
     Varias funciones para utilizar sqlite3 en :memory:
     Se pueden importar/exportar bases de datos desde/hacia archivos dump.sql
     Se pueden importar/exportar tablas desde/hacia archivos .csv
+    Se puede guardar la base :memory: en una base .sqlite
     Se pueden adjuntar bases de datos .sqlite
     Se utiliza el módulo easygui y a través de los distintos diálogos que aparecen
         en pantalla se introducen datos, se eligen acciones a realizar, etc...
@@ -137,12 +138,10 @@ def recuperar_base(origen, _master = None):
                 for _line in _f:
                     _con.execute(_line)
         if origen == 2:  # desde *.sqlite
-            _archivo = eg.fileopenbox(default = './*.sqlite3', filetypes = [['*.sqlite', '*.sqlite3', 'Sqlite Files']])
+            _archivo = eg.fileopenbox(default = './*.sqlite', filetypes = [['*.sqlite', '*.sqlite3', 'Sqlite Files']])
             _con.execute('attach database "' + _archivo + '" as adjunta')
-
     except:
-        '''que hace'''
-        # pass
+        pass
     finally:  # recuperar esquema
         if origen == 0:
             _master = 'sqlite_master'
@@ -291,11 +290,13 @@ def ver_gui(v = True):
                             sql o csv: se crea(n) tabla(s) en memoria\n
                             sqlite:    se adjunta base''',
                              'Recuperar Base',
-                             choices = ['*.sql', '*.csv', '*.sqlite'])
-            if _x == 1:
+                             choices = ['*.csv', '*.sql', '*.sqlite'])
+            if _x == 0:
                 csv2tabla()
-            else:
+            elif _x in range(1, 3):
                 recuperar_base(_x)
+            else:
+                continue
 
         if _respuesta == 'salir':
             break
