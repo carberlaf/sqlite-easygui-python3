@@ -17,6 +17,7 @@
 """
 
 import sqlite3 as sq
+
 import easygui as eg
 
 # A utilizar como título en las ventanas
@@ -36,7 +37,7 @@ def _cuantos_campos(num):  # se utiliza en la funcion crear tabla
     return _campos
 
 
-def _concat(*args, sep=','):  # se utiliza para concatenar las sentencias sql
+def _concat(*args, sep = ','):  # se utiliza para concatenar las sentencias sql
     return sep.join(*args)
 
 
@@ -52,12 +53,12 @@ def crear_tabla():
     """
     try:
         _tabla, num_campos = eg.multenterbox('Datos de la tabla', TITULO,
-                                             fields=['nombre de la tabla', 'número de campos'])
-        _campos = eg.multenterbox(msg='Introducir nombres de campos',
-                                  title=TITULO,
-                                  fields=_cuantos_campos(int(num_campos)),
-                                  values=_cuantos_campos(int(num_campos)))
-        _sql = 'create table ' + _tabla + '(' + _concat(_campos, sep=',') + ');'
+                                             fields = ['nombre de la tabla', 'número de campos'])
+        _campos = eg.multenterbox(msg = 'Introducir nombres de campos',
+                                  title = TITULO,
+                                  fields = _cuantos_campos(int(num_campos)),
+                                  values = _cuantos_campos(int(num_campos)))
+        _sql = 'create table ' + _tabla + '(' + _concat(_campos, sep = ',') + ');'
         _c.execute(_sql)
         esquema[_tabla] = _campos
         _con.commit()
@@ -75,7 +76,7 @@ def insertar_datos(tabla):
     """
     try:
         datos = eg.multenterbox('Introducir Datos', TITULO, esquema[tabla])
-        _sql = "insert into " + tabla + " values('" + _concat(datos, sep="','") + "');"
+        _sql = "insert into " + tabla + " values('" + _concat(datos, sep = "','") + "');"
         _c.execute(_sql)
         _con.commit()
     except:
@@ -106,12 +107,12 @@ def guardar_base():
     Se guarda la base en un archivo 'dump' con extensión .sql
     :return: None
     """
-    with open(eg.filesavebox('', '', default="dump_*.sql", filetypes=' \*.sql'), 'w') as _f:
+    with open(eg.filesavebox('', '', default = "dump_*.sql", filetypes = ' \*.sql'), 'w') as _f:
         for _line in _con.iterdump():
             _f.write('%s\n' % _line)
 
 
-def recuperar_base(origen, _master=None):
+def recuperar_base(origen, _master = None):
     """
     Según el origen:
         si .sql(0) se abre base
@@ -124,15 +125,16 @@ def recuperar_base(origen, _master=None):
     """
     try:
         if origen == 0:  # desde .sql
-            with open(eg.fileopenbox(default='./*.sql'), 'r') as _f:
+            with open(eg.fileopenbox(default = './*.sql'), 'r') as _f:
                 for _line in _f:
                     _con.execute(_line)
         if origen == 2:  # desde *.sqlite
-            _archivo = eg.fileopenbox(default='./*.sqlite3', filetypes=[['*.sqlite', '*.sqlite3', 'Sqlite Files']])
+            _archivo = eg.fileopenbox(default = './*.sqlite3', filetypes = [['*.sqlite', '*.sqlite3', 'Sqlite Files']])
             _con.execute('attach database "' + _archivo + '" as adjunta')
 
     except:
-        pass
+        '''que hace'''
+        # pass
     finally:  # recuperar esquema
         if origen == 0:
             _master = 'sqlite_master'
@@ -162,7 +164,7 @@ def actualizar_datos(tabla, rowid, *nuevos):
         _valores = nuevos
     try:
         datos = eg.multenterbox('Actualizar registro con rowid %s' % rowid, TITULO,
-                                fields=esquema[tabla], values=_valores)
+                                fields = esquema[tabla], values = _valores)
         l = dict(zip(esquema[tabla], datos))
         sql = 'update ' + tabla + ' set '
         for k, v in l.items():
@@ -180,12 +182,12 @@ def tabla2csv():
     :return: muestra un cuadro con el contenido del archivo creado para su comprobación
     """
     import csv
-    tabla = eg.choicebox('Seleccionar tabla a convertir a .csv', TITULO, choices=list(esquema.keys()))
+    tabla = eg.choicebox('Seleccionar tabla a convertir a .csv', TITULO, choices = list(esquema.keys()))
     archivo = tabla + '.csv'
     respuesta = _c.execute('select * from ' + tabla).fetchall()
     with open(archivo, 'w') as f:
         fieldnames = respuesta[0].keys()
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer = csv.DictWriter(f, fieldnames = fieldnames)
         writer.writeheader()
         for x in range(len(respuesta)):
             writer.writerow({k: respuesta[x][k] for k in respuesta[x].keys()})
@@ -204,23 +206,23 @@ def csv2tabla():
     :return: None
     """
     from csv import reader
-    arch = eg.fileopenbox(default='*.csv')
+    arch = eg.fileopenbox(default = '*.csv')
     tabla = arch.split('/')[len(arch.split('/')) - 1].replace('.csv', '')
     with open(arch) as f:
         lector = reader(f)
         nombre_campos = next(lector)
         sql = 'create table ' + tabla + '(' \
-              + _concat(nombre_campos, sep=',') + ')'
+              + _concat(nombre_campos, sep = ',') + ')'
         _c.execute(sql)
         esquema[tabla] = nombre_campos
         for row in lector:
             sql = "insert into " + tabla + " values('" + \
-                  _concat(row, sep="','") + "');"
+                  _concat(row, sep = "','") + "');"
             _c.execute(sql)
 
 
 # Muestra diálogo inicial para seleccionar la acción a ejecutar
-def ver_gui(v=True):
+def ver_gui(v = True):
     while v:
         if len(list(esquema.keys())) > 0:
             _acciones = ['crear tabla', 'insertar', 'ver',
@@ -238,18 +240,18 @@ def ver_gui(v=True):
             crear_tabla()
 
         if _respuesta == 'insertar':
-            _tabla = eg.choicebox('Seleccionar tabla', _respuesta, choices=list(esquema.keys()))
+            _tabla = eg.choicebox('Seleccionar tabla', _respuesta, choices = list(esquema.keys()))
             if not _tabla:
                 continue
             insertar_datos(_tabla)
 
         if _respuesta == 'ver':
-            _tabla = eg.choicebox('Seleccionar tabla', _respuesta, choices=list(esquema.keys()))
+            _tabla = eg.choicebox('Seleccionar tabla', _respuesta, choices = list(esquema.keys()))
             if _tabla:
                 ver_datos(_tabla)
 
         if _respuesta == 'actualizar':
-            _tabla = eg.choicebox('Seleccionar tabla', _respuesta, choices=list(esquema.keys()))
+            _tabla = eg.choicebox('Seleccionar tabla', _respuesta, choices = list(esquema.keys()))
             _rowid = eg.integerbox('Seleccionar rowid', _respuesta)
             if not _tabla or not _rowid:
                 continue
@@ -262,11 +264,13 @@ def ver_gui(v=True):
                             En formato csv una sola tabla
                         pero también de las adjuntas''',
                              TITULO,
-                             choices=['en sql', 'en csv'])
+                             choices = ['en sql', 'en csv', 'en sqlite'])
             if _x == 0:
                 guardar_base()
             elif _x == 1:
                 tabla2csv()
+            elif _x == 2:
+                guardar_sqlite()
             else:
                 continue
 
@@ -275,7 +279,7 @@ def ver_gui(v=True):
                             sql o csv: se crea(n) tabla(s) en memoria\n
                             sqlite:    se adjunta base''',
                              'Recuperar Base',
-                             choices=['*.sql', '*.csv', '*.sqlite'])
+                             choices = ['*.sql', '*.csv', '*.sqlite'])
             if _x == 1:
                 csv2tabla()
             else:
@@ -283,6 +287,20 @@ def ver_gui(v=True):
 
         if _respuesta == 'salir':
             break
+
+
+def guardar_sqlite():
+    import io
+    stream = io.StringIO()
+    for line in _con.iterdump():
+        stream.write(line)
+    archivo = eg.enterbox('Nombre de la nueva base .sqlite', TITULO)
+    if archivo is None:
+        return
+    nueva_base = sq.connect(archivo)
+    nueva_base.executescript(stream.getvalue())
+    stream.close()
+    nueva_base.close()
 
 
 def _inicio():
