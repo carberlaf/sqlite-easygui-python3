@@ -67,6 +67,14 @@ def crear_tabla():
         pass
 
 
+def borrar_tabla():
+    _tabla = eg.choicebox('Elegir tabla a eliminar', TITULO, choices=list(esquema.keys()))
+    if _tabla is None:
+        return
+    _c.execute('drop table %s' % _tabla)
+    esquema.pop(_tabla)
+
+
 def insertar_datos(tabla):
     """
     Se muestra un diálogo con los nombres de los campos
@@ -225,7 +233,8 @@ def csv2tabla():
 def ver_gui(v = True):
     while v:
         if len(list(esquema.keys())) > 0:
-            _acciones = ['crear tabla', 'insertar', 'ver',
+            _acciones = ['crear tabla', 'borrar tabla',
+                         'insertar', 'ver',
                          'actualizar', 'guardar',
                          'recuperar', 'salir']
         else:
@@ -239,19 +248,22 @@ def ver_gui(v = True):
         if _respuesta == 'crear tabla':
             crear_tabla()
 
+        if _respuesta == 'borrar tabla':
+            borrar_tabla()
+
         if _respuesta == 'insertar':
-            _tabla = eg.choicebox('Seleccionar tabla', _respuesta, choices = list(esquema.keys()))
+            _tabla = eg.choicebox('Insertar registros a...', TITULO, choices = list(esquema.keys()))
             if not _tabla:
                 continue
             insertar_datos(_tabla)
 
         if _respuesta == 'ver':
-            _tabla = eg.choicebox('Seleccionar tabla', _respuesta, choices = list(esquema.keys()))
+            _tabla = eg.choicebox('Seleccionar registros de... ', TITULO, choices = list(esquema.keys()))
             if _tabla:
                 ver_datos(_tabla)
 
         if _respuesta == 'actualizar':
-            _tabla = eg.choicebox('Seleccionar tabla', _respuesta, choices = list(esquema.keys()))
+            _tabla = eg.choicebox('Actualizar registro en...', TITULO, choices = list(esquema.keys()))
             _rowid = eg.integerbox('Seleccionar rowid', _respuesta)
             if not _tabla or not _rowid:
                 continue
