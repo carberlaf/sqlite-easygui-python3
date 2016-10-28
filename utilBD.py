@@ -10,6 +10,7 @@
      Several functions to use sqlite3 in: memory:
      You can import / export databases from / to dump.sql files
      You can import / export tables from / to CSV files
+     You can convert a :memory: in a database .sqlite
      You can attach databases .sqlite
      It's used the module easygui and through the various dialogs displayed
          in screen: data is entered, actions are chosen to perform, etc ...
@@ -66,6 +67,14 @@ def new_table():
         eg.msgbox('Created table ' + _table, TITLE)
     except:
         pass
+
+
+def delete_table():
+    _table = eg.choicebox('Choose table to delete', TITLE, choices=list(scheme.keys()))
+    if _table is None:
+        return
+    _c.execute('drop table %s' % _table)
+    scheme.pop(_table)
 
 
 def insert_data(table):
@@ -225,7 +234,8 @@ def csv2table():
 def display_gui(v = True):
     while v:
         if len(list(scheme.keys())) > 0:
-            _actions = ['new table', 'insert', 'select',
+            _actions = ['new table', 'delete table',
+                        'insert', 'select',
                         'update', 'save',
                         'recover', 'quit']
         else:
@@ -238,6 +248,9 @@ def display_gui(v = True):
 
         if _response == 'new table':
             new_table()
+
+        if _response == 'delete table':
+            delete_table()
 
         if _response == 'insert':
             _table = eg.choicebox('Choose table to insert', _response, choices = list(scheme.keys()))
@@ -264,11 +277,13 @@ def display_gui(v = True):
                         In .csv format one by one table,
                     but also from the attached bases''',
                              TITLE,
-                             choices = ['in .sql', 'in .csv'])
+                             choices = ['in .sql', 'in .csv', 'in sqlite'])
             if _x == 0:
                 save_base()
             elif _x == 1:
                 table2csv()
+            elif _x == 2:
+                save_sqlite()
             else:
                 continue
 
@@ -286,6 +301,20 @@ def display_gui(v = True):
 
         if _response == 'quit':
             break
+
+
+def save_sqlite():
+    import io
+    stream = io.StringIO()
+    for line in _con.iterdump():
+        stream.write(line)
+    file = eg.enterbox('Name of new database .sqlite', TITLE)
+    if file is None:
+        return
+    new = sq.connect(file)
+    new.executescript(stream.getvalue())
+    stream.close()
+    new.close()
 
 
 def _init():
