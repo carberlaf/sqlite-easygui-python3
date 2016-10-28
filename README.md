@@ -11,4 +11,3 @@ Se puede utilizar desde la consola Python: from utilBD import *
 o desde terminal linux. Hacerlo ejecutable.  
 En la rama master está la versión en español.
 
-#
