@@ -139,7 +139,7 @@ def recover_base(origin, _master = None):
                 for _line in _f:
                     _con.execute(_line)
         if origin == 2:  # from *.sqlite
-            _file = eg.fileopenbox(default = './*.sqlite3', filetypes = [['*.sqlite', '*.sqlite3', 'Sqlite Files']])
+            _file = eg.fileopenbox(default = './*.sqlite', filetypes = [['*.sqlite', '*.sqlite3', 'Sqlite Files']])
             _con.execute('attach database "' + _file + '" as attached')
 
     except:
@@ -293,11 +293,13 @@ def display_gui(v = True):
                              csv:    import one table\n
                              sqlite: attach base''',
                              'Recover base or table',
-                             choices = ['*.sql', '*.csv', '*.sqlite'])
-            if _x == 1:
+                             choices = ['*.csv', '*.sql', '*.sqlite'])
+            if _x == 0:
                 csv2table()
-            else:
+            elif _x in range(1, 3):
                 recover_base(_x)
+            else:
+                continue
 
         if _response == 'quit':
             break
