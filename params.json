@@ -1,0 +1,6 @@
+{
+  "name": "Sqlite-easygui-python3",
+  "tagline": "Utils sqlite3 (:memory:) with light interface made with easygui and python3.5.2",
+  "body": "#sqlite-easygui-python3  \r\n\r\nUtils sqlite3 (:memory:) with light interface made with easygui and python3.5.2\r\n\r\nThere is a branch with an english version.\r\n\r\n#utilBD  \r\n\r\nUtiliza módulo **easygui** para mostrar una interface \"volante\".  \r\nSe puede utilizar desde la consola Python: from utilBD import * \r\no desde terminal linux. Hacerlo ejecutable.  \r\nEn la rama master está la versión en español.\r\n\r\n",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
