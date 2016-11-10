@@ -134,7 +134,7 @@ def recover_base(origin, _master = None):
      : Return: None
     """
     try:
-        if origin == 0:  # from .sql
+        if origin == 1:  # from .sql
             with open(eg.fileopenbox(default = './*.sql'), 'r') as _f:
                 for _line in _f:
                     _con.execute(_line)
@@ -145,7 +145,7 @@ def recover_base(origin, _master = None):
     except:
         pass
     finally:  # update scheme
-        if origin == 0:
+        if origin == 1:
             _master = 'sqlite_master'
         if origin == 2:
             _master = 'attached.sqlite_master'
