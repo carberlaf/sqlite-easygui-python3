@@ -133,7 +133,7 @@ def recuperar_base(origen, _master = None):
     :return: None
     """
     try:
-        if origen == 0:  # desde .sql
+        if origen == 1:  # desde .sql
             with open(eg.fileopenbox(default = './*.sql'), 'r') as _f:
                 for _line in _f:
                     _con.execute(_line)
@@ -143,7 +143,7 @@ def recuperar_base(origen, _master = None):
     except:
         pass
     finally:  # recuperar esquema
-        if origen == 0:
+        if origen == 1:
             _master = 'sqlite_master'
         if origen == 2:
             _master = 'adjunta.sqlite_master'
