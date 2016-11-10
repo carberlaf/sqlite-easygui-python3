@@ -17,3 +17,9 @@ Se puede utilizar:
 
 En la rama master está la versión en español.
 
+# utilidades
+
+- Se pueden importar/exportar bases de datos desde/hacia archivos \<dump\>.sql
+- Se pueden importar/exportar tablas desde/hacia archivos .csv
+- Se puede guardar la base :memory: en una base .sqlite
+- Se pueden adjuntar bases de datos .sqlite
