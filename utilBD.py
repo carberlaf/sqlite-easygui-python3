@@ -6,7 +6,7 @@
         la acción salir en este modo cierra la aplicación
     Si se importa a PythonConsole -> from utilBD import *
         la acción salir oculta la gui
-        teclear >>> ver_gui() para mostrar de nuevo el cuadro de acciones en pantalla
+        con ver_gui() se  muestra de nuevo el cuadro de acciones en pantalla
     Varias funciones para utilizar sqlite3 en :memory:
     Se pueden importar/exportar bases de datos desde/hacia archivos dump.sql
     Se pueden importar/exportar tablas desde/hacia archivos .csv
