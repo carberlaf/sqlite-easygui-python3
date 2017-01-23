@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 """
-    The basic interface of the application is a choice box screen actions
+    The basic interface of the application is a choice box action screen
          If it runs on Linux terminal. -> ./utilBd.py
              action out in this way closes the application
          If you import to PythonConsole -> from utilBD import *
@@ -46,11 +46,11 @@ def _concat(*args, sep = ','):  # used to format the sql
 def new_table():
     """
     You must enter into a dialogue_box:
-         the name of the table to create and
-         the number of fields that will have the table
+         the name of the table to be created and
+         the number of fields that  the table will have
      By default creates fields with names:
          field1, field2, ..., field_n
-     In the next dialog_box shown,  gives option to change these names
+     In the next dialog_box shown, it gives option to change these names
      : Return: message-table
     """
     try:
@@ -79,7 +79,7 @@ def delete_table():
 
 def insert_data(table):
     """
-    A dialog_box is displayed with the field names to enter values for each
+    A dialog_box is displayed with the field names to enter values for each one
      : Param table: str
      : Return None
     """
@@ -109,12 +109,12 @@ def select_data(table):
             reading += str(list([*_row])) + "\n"
         eg.textbox('Content in %s' % table, TITLE, reading)
     except:
-        pass  # if button cancel is pressed
+        pass  # if cancel button is pressed
 
 
 def save_base():
     """
-    Save the all database in a file 'dump' with extension .sql
+    Save the whole database in a file 'dump' with extension .sql
     :return: None
     """
     with open(eg.filesavebox('', '', default = "dump_*.sql", filetypes = ' \*.sql'), 'w') as _f:
@@ -160,8 +160,8 @@ def update_data(table, rowid, *news):
      Data record (rowid) are updated within a table
      Both parameters are mandatory.
      If there is no *news parameter, it takes the record and the current status is displayed
-         to allow modify data.
-     If there's *news shows how would the record and give the OK.
+         to allow modifications in data.
+     If *news exists it will show the record as it would be in order to give the OK.
      : param table: str
      : param rowid: int
      : param *news: list
@@ -187,7 +187,7 @@ def update_data(table, rowid, *news):
 
 def table2csv():
     """
-     A table is chosen and save it in a file named <table>.csv
+     A table is chosen and saved in a file named <table>.csv
      : return: displays a text_box with the file content created for verification
     """
     import csv
