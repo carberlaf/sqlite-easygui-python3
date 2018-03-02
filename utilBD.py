@@ -64,8 +64,8 @@ def crear_tabla():
         esquema[_tabla] = _campos
         _con.commit()
         eg.msgbox('Creada tabla ' + _tabla, TITULO)
-    except:
-        pass
+    except Exception:
+        return
 
 
 def borrar_tabla():
@@ -88,7 +88,7 @@ def insertar_datos(tabla):
         _sql = "insert into " + tabla + " values('" + _concat(datos, sep = "','") + "');"
         _c.execute(_sql)
         _con.commit()
-    except:
+    except Exception:
         pass
 
 
@@ -107,8 +107,8 @@ def ver_datos(tabla):
         for _row in registros:
             lectura += str(list([*_row])) + "\n"
         eg.textbox('Datos en ' + tabla, TITULO, lectura)
-    except:
-        pass
+    except Exception:
+        return
 
 
 def guardar_base():
@@ -140,7 +140,7 @@ def recuperar_base(origen, _master = None):
         if origen == 2:  # desde *.sqlite
             _archivo = eg.fileopenbox(default = './*.sqlite', filetypes = [['*.sqlite', '*.sqlite3', 'Sqlite Files']])
             _con.execute('attach database "' + _archivo + '" as adjunta')
-    except:
+    except Exception:
         pass
     finally:  # recuperar esquema
         if origen == 1:
@@ -172,15 +172,15 @@ def actualizar_datos(tabla, rowid, *nuevos):
     try:
         datos = eg.multenterbox('Actualizar registro con rowid %s' % rowid, TITULO,
                                 fields = esquema[tabla], values = _valores)
-        l = dict(zip(esquema[tabla], datos))
+        pares = dict(zip(esquema[tabla], datos))
         sql = 'update ' + tabla + ' set '
-        for k, v in l.items():
+        for k, v in pares.items():
             sql += k + '="' + v + '",'
         sql = sql[0:len(sql) - 1]  # quito la ultima coma
         sql += ' where rowid=' + str(rowid) + ';'
         _c.execute(sql)
     except TypeError:  # si se cancela la entrada de datos
-        pass
+        return
 
 
 def tabla2csv():
